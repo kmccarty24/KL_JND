@@ -188,7 +188,8 @@ for thisTrial in trials:
 
     jnd_exp.nextEntry()
 
+trials.finishjed = True
 dataFile.close()
 win.close()
 core.quit()
-quit() 
+quit()
