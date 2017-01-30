@@ -1,0 +1,6 @@
+Direction,Offset,.thisRepN,.thisTrialN,.thisN,.thisIndex,Direction,targetOri,trialType,Moves,Target Ori,Probe Start,Initial Offset,End Offset,Decision Time,Date,Participant No,baseOri,
+Clock,1,0,0,0,3,Clock,194,Clock,4,194,195,-1,-1,1.92057664227,Jan_30_1443,me,45,
+Clock,13,0,1,1,1,Clock,313,Clock,5,313,326,-13,-8,0.949176823255,Jan_30_1443,me,45,
+Clock,16,0,2,2,2,Clock,195,Clock,8,195,211,-16,-24,1.20018232218,Jan_30_1443,me,45,
+AntiClock,8,0,3,3,4,AntiClock,240,AntiClock,5,240,232,8,3,1.39405657933,Jan_30_1443,me,45,
+Clock,1,0,4,4,0,Clock,131,Clock,6,131,132,-1,5,1.47387750307,Jan_30_1443,me,45,

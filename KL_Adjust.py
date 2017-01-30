@@ -17,7 +17,7 @@ info['baseOri'] = 45 # A good start point
 
 # Generate some random orientation differences
 
-def RandomOffsets(iterations = 50):
+def RandomOffsets(iterations = 5):
     '''This Function acts as generator for a list of dictionaires to be fed into a trial handler'''
 
     probeTargetDiffs = [random.randint(1,20) for x in range(iterations)]
@@ -42,16 +42,16 @@ rtClock = core.Clock()
 
 # gratings
 target = visual.GratingStim(win, tex='sin', 
-                            mask='gauss', 
-                            size = 3.0, 
+                            mask='circle', 
+                            size = 10.0, 
                             sf=3.0, 
                             ori=info['baseOri'], 
                             contrast=1.0,
                             units = 'deg')
 
 probe = visual.GratingStim(win, tex='sin', 
-                           mask='gauss', 
-                           size = 3.0, 
+                           mask='circle', 
+                           size = 10.0, 
                            sf=3.0,
                            ori=info['baseOri'],
                            contrast=1.0,
@@ -84,7 +84,7 @@ jnd_exp = data.ExperimentHandler(
         )
 
 # Trial handler
-trials = data.TrialHandler(trialList = RandomOffsets(), nReps = 25, method='random') 
+trials = data.TrialHandler(trialList = RandomOffsets(), nReps = 1, method='random') 
 
 jnd_exp.addLoop(trials)
 
@@ -108,6 +108,7 @@ for thisTrial in trials:
     targetOri = random.randint(20,340) # 20 / 340 to alow a maximum of 20 degrees difference either way
 
     if targetOri in [0, 90, 180, 270]: # to eliminate vertical or horizontal, no 0 as its not a valid int
+        print "Adjusting Vertical"
         targetOri+= 10
     trials.addData('targetOri', targetOri)
 
@@ -119,10 +120,13 @@ for thisTrial in trials:
     if thisTrial['Direction'] == 'Clock': 
         probe.ori = (targetOri + thisTrial['Offset']) # rotate clockwise
         probeOri = (targetOri + thisTrial['Offset'])
+        print "Clockwise", targetOri,  probeOri
         trials.addData('trialType', thisTrial['Direction'])
     elif thisTrial['Direction'] == 'AntiClock':
         probe.ori = (targetOri - thisTrial['Offset']) # rotate anticlockwise
         probeOri = (targetOri - thisTrial['Offset'])
+        print "Anti Clockwise", targetOri,  probeOri
+
         trials.addData('trialType', thisTrial['Direction'])
 
      
@@ -157,6 +161,7 @@ for thisTrial in trials:
         if keys[0] == 'q':
             print 'Quitting'
             trials.finished = True
+            win.close()
             core.quit()
             quit()
         elif keys[0] == 'right':
@@ -172,12 +177,12 @@ for thisTrial in trials:
             trials.addData('Probe Start', probeOri)
             trials.addData('Initial Offset', (targetOri - probeOri))
             trials.addData('End Offset', (targetOri - probe.ori))
-            trials.addData('Decision Time',rt)
+            trials.addData('Decision Time', rt)
             dataFile.write("%i \t %s \t %i \t %i \t %i \t %i \t %2f \t %i \n" %(trialNo, 
                                                                                 thisTrial['Direction'], 
-                                                                                targetOri, ProbeOri, 
-                                                                                (targetOri - ProbeOri),
-                                                                                (targetOri - probe.ori),
+                                                                                targetOri, probeOri, 
+                                                                                (abs(targetOri - probeOri)),
+                                                                                (abs(targetOri - probe.ori)),
                                                                                 rt, iteration))
             break
 

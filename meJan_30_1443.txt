@@ -1,0 +1,6 @@
+TrialNo	trialType	TargetOri	ProbeStart	InitialOffset	EndOffset	DecisionTime	Moves
+1 	 Clock 	 194 	 195 	 -1 	 -1 	 1.920577 	 4 
+2 	 Clock 	 313 	 326 	 -13 	 -8 	 0.949177 	 5 
+3 	 Clock 	 195 	 211 	 -16 	 -24 	 1.200182 	 8 
+4 	 AntiClock 	 240 	 232 	 8 	 3 	 1.394057 	 5 
+5 	 Clock 	 131 	 132 	 -1 	 5 	 1.473878 	 6 
