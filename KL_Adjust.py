@@ -17,13 +17,22 @@ info['baseOri'] = 45 # A good start point
 
 # Generate some random orientation differences
 
-probeTargetDiffs = [random.randint(1,20) for x in range(50)]
+def RandomOffsets(iterations = 50):
+    '''This Function acts as generator for a list of dictionaires to be fed into a trial handler'''
+
+    probeTargetDiffs = [random.randint(1,20) for x in range(iterations)]
+
+    trialList = []
+    for angleOffset in probeTargetDiffs:
+        trialList.append({'Offset': angleOffset, 'Direction': (random.choice(['Clock', 'AntiClock']))})
+
+    return trialList
 
 
 # Datafile (just in case not one written by PsychoPy)
 fileName = info['Participant No'] + info['Date']
 dataFile = open(fileName + '.txt', 'w')
-dataFile.write('trialType\trt\tresp\ttargetOri\tprobeOri\toriIncrement\t correct\n')
+dataFile.write('trialType\tTargetOri\tProbeStart\tInitialOffset\tEndOffset\tDecisionTime\tMoves\n')
 
 # window
 win = visual.Window(monitor= 'default', size = (1024, 768), fullscr = False, color = 'grey', screen = 1) # make fullscreen once it actually works!
@@ -75,88 +84,101 @@ jnd_exp = data.ExperimentHandler(
         )
 
 # Trial handler
-trials = data.TrialHandler(trialList = data.importConditions('trials.xlsx'), nReps = 25, method='random') 
+trials = data.TrialHandler(trialList = RandomOffsets(), nReps = 25, method='random') 
+
+jnd_exp.addLoop(trials)
 
 # Trial sequence
 
 displayInstructions(text = instrText)
 
 for thisTrial in trials:
+
+    trials.addData('Direction', thisTrial['Direction'])
     
     event.clearEvents()
     rt = None
     resp = None
-    
     iteration = 0
-    
-    # Choose Clockwise or anti Clockwise
-    trialType = random.choice([1,-1]) # 1 = Clockwise, -1 = Anticlockwise
-    if trialType == 1:
-        trials.addData('TrialType', 'ClockWise')
-    elif trialType == -1:
-        trials.addData('TrialType', 'AntiClockWise')
 
-    # EXPERIMENTAL RANDOM PICKER
     # Choose a random orientation for the target
     targetOri = random.randint(20,340) # 20 / 340 to alow a maximum of 20 degrees difference either way
 
-    if targetOri in [90, 180, 270]: # to eliminate vertical or horizontal, no 0 as its not a valid int
+    if targetOri in [0, 90, 180, 270]: # to eliminate vertical or horizontal, no 0 as its not a valid int
         targetOri+= 10
     trials.addData('targetOri', targetOri)
 
     # Assign the Target and Probe Orientations
     target.ori = targetOri
 
-    if trialType == 1: 
-        probe.ori = targetOri + thisTrial['trialType'] # rotate clockwise
-        probeOri = targetOri + thisTrial['trialType']
-    elif trialType == -1:
-        probe.ori = targetOri - thisTrial['trialType'] # rotate anticlockwise
-        probeOri = targetOri - thisTrial['trialType']
+
+    #Probe Fixing
+    if thisTrial['Direction'] == 'Clock': 
+        probe.ori = (targetOri + thisTrial['Offset']) # rotate clockwise
+        probeOri = (targetOri + thisTrial['Offset'])
+        trials.addData('trialType', thisTrial['Direction'])
+    elif thisTrial['Direction'] == 'AntiClock':
+        probe.ori = (targetOri - thisTrial['Offset']) # rotate anticlockwise
+        probeOri = (targetOri - thisTrial['Offset'])
+        trials.addData('trialType', thisTrial['Direction'])
+
+     
+     #Display Fixation / Target / Fixation for 500ms (30 frames @ 60Hz)
+
+    for frameN in range(30): #changed as disptime misbehaving
+        fix.draw()
+        win.flip()
+
+    for frameN in range(30):
+        target.draw()
+        win.flip()
+
+    for frameN in range(30):
+        fix.draw()
+        win.flip()
+    
+
+    win.callOnFlip(rtClock.reset)
+
+    # Now draw the Probe and allow participants to tinker
 
     while True:
 
         event.clearEvents(eventType ='keyboard')
 
-        for frameN in range(30): #changed as disptime misbehaving
-            fix.draw()
-            win.flip()
+        probe.draw()
+        win.flip()
 
-        for frameN in range(30):
-            target.draw()
-            win.flip()
-            
-        for frameN in range(30):
-            fix.draw()
-            win.flip()
-            
-            event.clearEvents()
-            win.callOnFlip(rtClock.reset)
-            
-        for frameN in range(300):
-            probe.draw()
-            win.flip()
+        keys = event.waitKeys(keyList = ['q', 'left', 'right', 'space'])
 
-            keys = event.waitKeys(keyList = ['q', 'left', 'right'])
+        if keys[0] == 'q':
+            print 'Quitting'
+            trials.finished = True
+            core.quit()
+            quit()
+        elif keys[0] == 'right':
+            iteration +=1
+            probe.ori+=1
+        elif keys[0] == 'left':
+            iteration +=1
+            probe.ori-=1
+        elif keys[0] == 'space':
+            rt = rtClock.getTime()
+            trials.addData('Moves', iteration)
+            trials.addData('Target Ori', targetOri)
+            trials.addData('Probe Start', probeOri)
+            trials.addData('Initial Offset', (targetOri - probeOri))
+            trials.addData('End Offset', (targetOri - probe.ori))
+            trials.addData('Decision Time',rt)
+            dataFile.write("%s \t %i \t %i \t %i \t %i \t %2f \t %i \n" %(thisTrial['Direction'], 
+                                                                          targetOri, ProbeOri, 
+                                                                          (targetOri - ProbeOri),
+                                                                          (targetOri - probe.ori),
+                                                                          rt, iteration))
+            break
 
-            if keys[0] == 'q':
-                print 'Quitting'
-                core.quit()
-                quit()
-            elif keys[0] == 'right':
-                iteration +=1
-                probe.ori+=1
-            elif keys[0] == 'left':
-                iteration +=1
-                probe.ori-=1
-                
-            resp = target.ori - probe.ori
+    jnd_exp.nextEntry()
 
-    trials.addData('Reaction Time', rt)
-    trials.addData('Response', resp)
-    RT_Exp.nextEntry()
-    
-trials.saveAsExcel(fileName = filename)
 win.close()
 core.quit()
 quit() 
