@@ -17,10 +17,10 @@ info['baseOri'] = 45 # A good start point
 
 # Generate some random orientation differences
 
-def RandomOffsets(iterations = 5):
+def RandomOffsets(iterations = 50):
     '''This Function acts as generator for a list of dictionaires to be fed into a trial handler'''
 
-    probeTargetDiffs = [random.randint(1,20) for x in range(iterations)]
+    probeTargetDiffs = [random.random_integers(low = 1, high = 20) for x in range(iterations)]
 
     trialList = []
     for angleOffset in probeTargetDiffs:
