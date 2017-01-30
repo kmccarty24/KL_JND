@@ -32,7 +32,7 @@ def RandomOffsets(iterations = 50):
 # Datafile (just in case not one written by PsychoPy)
 fileName = info['Participant No'] + info['Date']
 dataFile = open(fileName + '.txt', 'w')
-dataFile.write('trialType\tTargetOri\tProbeStart\tInitialOffset\tEndOffset\tDecisionTime\tMoves\n')
+dataFile.write('TrialNo\ttrialType\tTargetOri\tProbeStart\tInitialOffset\tEndOffset\tDecisionTime\tMoves\n')
 
 # window
 win = visual.Window(monitor= 'default', size = (1024, 768), fullscr = False, color = 'grey', screen = 1) # make fullscreen once it actually works!
@@ -92,6 +92,8 @@ jnd_exp.addLoop(trials)
 
 displayInstructions(text = instrText)
 
+trialNo = 0
+
 for thisTrial in trials:
 
     trials.addData('Direction', thisTrial['Direction'])
@@ -100,6 +102,7 @@ for thisTrial in trials:
     rt = None
     resp = None
     iteration = 0
+    trialNo += 1
 
     # Choose a random orientation for the target
     targetOri = random.randint(20,340) # 20 / 340 to alow a maximum of 20 degrees difference either way
@@ -170,15 +173,17 @@ for thisTrial in trials:
             trials.addData('Initial Offset', (targetOri - probeOri))
             trials.addData('End Offset', (targetOri - probe.ori))
             trials.addData('Decision Time',rt)
-            dataFile.write("%s \t %i \t %i \t %i \t %i \t %2f \t %i \n" %(thisTrial['Direction'], 
-                                                                          targetOri, ProbeOri, 
-                                                                          (targetOri - ProbeOri),
-                                                                          (targetOri - probe.ori),
-                                                                          rt, iteration))
+            dataFile.write("%i \t %s \t %i \t %i \t %i \t %i \t %2f \t %i \n" %(trialNo, 
+                                                                                thisTrial['Direction'], 
+                                                                                targetOri, ProbeOri, 
+                                                                                (targetOri - ProbeOri),
+                                                                                (targetOri - probe.ori),
+                                                                                rt, iteration))
             break
 
     jnd_exp.nextEntry()
 
+dataFile.close()
 win.close()
 core.quit()
 quit() 
