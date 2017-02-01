@@ -1,5 +1,6 @@
 from psychopy import visual, event, core, data, gui
 import random, time
+import numpy as np 
 
 # gui at the start
 info = {}
@@ -17,10 +18,10 @@ info['baseOri'] = 45 # A good start point
 
 # Generate some random orientation differences
 
-def RandomOffsets(iterations = 50):
+def RandomOffsets(iterations = 5):
     '''This Function acts as generator for a list of dictionaires to be fed into a trial handler'''
 
-    probeTargetDiffs = [random.random_integers(low = 1, high = 20) for x in range(iterations)]
+    probeTargetDiffs = [np.random.random_integers(low = 1, high = 20) for x in range(iterations)]
 
     trialList = []
     for angleOffset in probeTargetDiffs:
@@ -162,8 +163,8 @@ for thisTrial in trials:
             print 'Quitting'
             trials.finished = True
             win.close()
-            core.quit()
-            quit()
+            #core.quit()
+            #quit()
         elif keys[0] == 'right':
             iteration +=1
             probe.ori+=1
@@ -175,8 +176,8 @@ for thisTrial in trials:
             trials.addData('Moves', iteration)
             trials.addData('Target Ori', targetOri)
             trials.addData('Probe Start', probeOri)
-            trials.addData('Initial Offset', (targetOri - probeOri))
-            trials.addData('End Offset', (targetOri - probe.ori))
+            trials.addData('Initial Offset', (abs(targetOri - probeOri)))
+            trials.addData('End Offset', (abs(targetOri - probe.ori)))
             trials.addData('Decision Time', rt)
             dataFile.write("%i \t %s \t %i \t %i \t %i \t %i \t %2f \t %i \n" %(trialNo, 
                                                                                 thisTrial['Direction'], 
@@ -188,7 +189,7 @@ for thisTrial in trials:
 
     jnd_exp.nextEntry()
 
-trials.finishjed = True
+trials.finished = True
 dataFile.close()
 win.close()
 core.quit()
