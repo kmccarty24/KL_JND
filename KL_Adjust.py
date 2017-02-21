@@ -21,7 +21,7 @@ info['baseOri'] = 45 # A good start point
 def RandomOffsets(iterations = 5):
     '''This Function acts as generator for a list of dictionaires to be fed into a trial handler'''
 
-    probeTargetDiffs = [np.random.random_integers(low = 1, high = 20) for x in range(iterations)]
+    probeTargetDiffs = [np.random.random_integers(low = 10, high = 20) for x in range(iterations)]
 
     trialList = []
     for angleOffset in probeTargetDiffs:
@@ -43,16 +43,16 @@ rtClock = core.Clock()
 
 # gratings
 target = visual.GratingStim(win, tex='sin', 
-                            mask='circle', 
-                            size = 10.0, 
+                            mask='gauss', 
+                            size = 3.0, 
                             sf=3.0, 
                             ori=info['baseOri'], 
                             contrast=1.0,
                             units = 'deg')
 
 probe = visual.GratingStim(win, tex='sin', 
-                           mask='circle', 
-                           size = 10.0, 
+                           mask='gauss', 
+                           size = 3.0, 
                            sf=3.0,
                            ori=info['baseOri'],
                            contrast=1.0,
@@ -64,7 +64,8 @@ fix = visual.TextStim(win, color='black', text = '+')
 # instructions
 instrText = ('In this experiment you will see two gratings presented one after the other.' +
             'When the second grating appears, please use the left and right keys to match it ' +
-            'to the orientation of the first. Press any key to continue.')
+            'to the orientation of the first, and press the space bar when satisfied. ' + 
+			'Press any key to continue.')
 
 def displayInstructions(text, acceptedKeys = None):
     instruct = visual.TextStim(win, text=instrText, color='black')
@@ -168,11 +169,13 @@ for thisTrial in trials:
         elif keys[0] == 'right':
             iteration +=1
             probe.ori+=1
+            rt = rtClock.getTime()
         elif keys[0] == 'left':
             iteration +=1
             probe.ori-=1
-        elif keys[0] == 'space':
             rt = rtClock.getTime()
+        elif keys[0] == 'space':
+            #rt = rtClock.getTime()
             trials.addData('Moves', iteration)
             trials.addData('Target Ori', targetOri)
             trials.addData('Probe Start', probeOri)
